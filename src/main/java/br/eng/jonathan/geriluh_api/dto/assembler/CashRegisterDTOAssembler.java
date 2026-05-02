@@ -2,47 +2,32 @@ package br.eng.jonathan.geriluh_api.dto.assembler;
 
 import br.eng.jonathan.geriluh_api.controller.CashRegisterController;
 import br.eng.jonathan.geriluh_api.dto.CashRegisterDTO;
+import br.eng.jonathan.geriluh_api.dto.UserDTO;
+import br.eng.jonathan.geriluh_api.dto.mapper.CashRegisterMapper;
 import br.eng.jonathan.geriluh_api.exception_handler.exceptions.NotFoundException;
 import br.eng.jonathan.geriluh_api.model.CashRegister;
+import br.eng.jonathan.geriluh_api.model.User;
 import br.eng.jonathan.geriluh_api.service.CashRegisterService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-@Service
-public class CashRegisterDTOAssembler {
+@Component
+@RequiredArgsConstructor
+public class CashRegisterDTOAssembler implements RepresentationModelAssembler<CashRegister, EntityModel<CashRegisterDTO>> {
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
-    private CashRegisterService service;
-
-    public CashRegisterDTO mapToDTO(CashRegister cashRegister) {
-        return modelMapper.map(cashRegister, CashRegisterDTO.class);
-    }
+    private final CashRegisterMapper cashRegisterMapper;
+    private final CashRegisterService cashRegisterService;
 
     public CashRegister mapToEntity(CashRegisterDTO cashRegisterDTO) throws NotFoundException {
-        CashRegister cashRegister = modelMapper.map(cashRegisterDTO, CashRegister.class);
-
-        if (cashRegisterDTO.getCashRegisterId() != null) {
-            CashRegister previousCashRegister = service.findCashRegisterById(cashRegisterDTO.getCashRegisterId());
-            cashRegister.setCashRegisterId(previousCashRegister.getCashRegisterId());
-            cashRegister.setInitDate(cashRegisterDTO.getInitDate() != null ? cashRegisterDTO.getInitDate() : previousCashRegister.getInitDate());
-            cashRegister.setEndDate(cashRegisterDTO.getEndDate() != null ? cashRegisterDTO.getEndDate() : previousCashRegister.getEndDate());
-            cashRegister.setInitialBalance(cashRegisterDTO.getInitialBalance() != null ? cashRegisterDTO.getInitialBalance() : previousCashRegister.getInitialBalance());
-            cashRegister.setEndBalance(cashRegisterDTO.getEndBalance() != null ? cashRegisterDTO.getEndBalance() : previousCashRegister.getEndBalance());
-            cashRegister.setTotalSales(cashRegisterDTO.getTotalSales() != null ? cashRegisterDTO.getTotalSales() : previousCashRegister.getTotalSales());
-            cashRegister.setTotalWithdrawals(cashRegisterDTO.getTotalWithdrawals() != null ? cashRegisterDTO.getTotalWithdrawals() : previousCashRegister.getTotalWithdrawals());
-            cashRegister.setStatus(cashRegisterDTO.getStatus() != null ? cashRegisterDTO.getStatus() : previousCashRegister.getStatus());
-            cashRegister.setNotes(cashRegisterDTO.getNotes() != null ? cashRegisterDTO.getNotes() : previousCashRegister.getNotes());
-            cashRegister.setUser(previousCashRegister.getUser()); // O campo `user` é normalmente mantido do registro anterior
-        }
-        return cashRegister;
+        //Refatorando...
     }
 
     /**
