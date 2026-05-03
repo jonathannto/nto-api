@@ -1,9 +1,11 @@
 package br.eng.jonathan.geriluh_api.service;
 
 import br.eng.jonathan.geriluh_api.dto.DishDTO;
+import br.eng.jonathan.geriluh_api.dto.mapper.DishMapper;
 import br.eng.jonathan.geriluh_api.exception_handler.exceptions.NotFoundException;
 import br.eng.jonathan.geriluh_api.model.Dish;
 import br.eng.jonathan.geriluh_api.repository.DishRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -13,15 +15,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class DishService {
 
     private static final String DISH_SEARCH_ERRO = "DISH.SEARCH_ERROR";
 
-    @Autowired
-    private MessageSource messageSource;
-
-    @Autowired
-    private DishRepository repository;
+    private final DishMapper dishMapper;
+    private final MessageSource messageSource;
+    private final DishRepository repository;
 
     public Page<Dish> listAllDishes(Pageable pagination) {
         return repository.findAll(pagination);
@@ -36,10 +37,9 @@ public class DishService {
     }
 
     public Dish updateDish(Long dishId, DishDTO dishDTO) {
-        Dish dish = repository.findById(dishId)
-                .orElseThrow(() -> new NotFoundException("Dish not found"));
+        Dish dish = findDishById(dishId);
 
-        BeanUtils.copyProperties(dishDTO, dish, "dishId");
+        dishMapper.updateEntityFromDto(dishDTO, dish);
 
         return repository.save(dish);
     }

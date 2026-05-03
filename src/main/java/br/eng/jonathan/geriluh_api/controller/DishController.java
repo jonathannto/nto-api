@@ -11,6 +11,7 @@ import br.eng.jonathan.geriluh_api.service.CashRegisterService;
 import br.eng.jonathan.geriluh_api.service.DishService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,18 +22,16 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/v1/dishes", produces = "application/json")
+@RequiredArgsConstructor
 public class DishController implements DishControllerOpenApi {
 
-    @Autowired
-    private DishService service;
-
-    @Autowired
-    private DishDTOAssembler assembler;
+    private final DishService service;
+    private final DishDTOAssembler assembler;
 
     @GetMapping
     public ResponseEntity<Page<EntityModel<DishDTO>>> list(Pageable pageable) {
         var dishes = service.listAllDishes(pageable)
-                .map(dish -> assembler.mapToEntityModelDTO(dish));
+                .map(assembler::toModel);
 
         return ResponseEntity.ok(dishes);
     }

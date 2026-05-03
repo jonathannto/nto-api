@@ -7,6 +7,7 @@ import br.eng.jonathan.geriluh_api.exception_handler.exceptions.NotFoundExceptio
 import br.eng.jonathan.geriluh_api.service.CashRegisterService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,18 +18,16 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/v1/cashes-registers", produces = "application/json")
+@RequiredArgsConstructor
 public class CashRegisterController implements CashRegisterControllerOpenApi {
 
-    @Autowired
-    private CashRegisterService service;
-
-    @Autowired
-    private CashRegisterDTOAssembler assembler;
+    private final CashRegisterService service;
+    private final CashRegisterDTOAssembler assembler;
 
     @GetMapping
     public ResponseEntity<Page<EntityModel<CashRegisterDTO>>> list(Pageable pageable) {
         var cashesRegisters = service.listAllCashRegister(pageable)
-                .map(cashRegister -> assembler.mapToEntityModelDTO(cashRegister));
+                .map(assembler::toModel);
 
         return ResponseEntity.ok(cashesRegisters);
     }

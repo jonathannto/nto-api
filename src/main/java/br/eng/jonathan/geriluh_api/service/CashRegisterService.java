@@ -1,9 +1,11 @@
 package br.eng.jonathan.geriluh_api.service;
 
 import br.eng.jonathan.geriluh_api.dto.CashRegisterDTO;
+import br.eng.jonathan.geriluh_api.dto.mapper.CashRegisterMapper;
 import br.eng.jonathan.geriluh_api.exception_handler.exceptions.NotFoundException;
 import br.eng.jonathan.geriluh_api.model.CashRegister;
 import br.eng.jonathan.geriluh_api.repository.CashRegisterRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -13,15 +15,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CashRegisterService {
 
     private static final String CASH_REGISTER_SEARCH_ERRO = "CASH_REGISTER.SEARCH_ERROR";
 
-    @Autowired
-    private MessageSource messageSource;
-
-    @Autowired
-    private CashRegisterRepository repository;
+    private final MessageSource messageSource;
+    private final CashRegisterMapper cashRegisterMapper;
+    private final CashRegisterRepository repository;
 
     public Page<CashRegister> listAllCashRegister(Pageable pagination) {
         return repository.findAll(pagination);
@@ -36,10 +37,9 @@ public class CashRegisterService {
     }
 
     public CashRegister updateCashRegister(Long cashRegisterId, CashRegisterDTO cashRegisterDTO) {
-        CashRegister cashRegister = repository.findById(cashRegisterId)
-                .orElseThrow(() -> new NotFoundException("CashRegister not found"));
+        CashRegister cashRegister = findCashRegisterById(cashRegisterId);
 
-        BeanUtils.copyProperties(cashRegisterDTO, cashRegister, "cashRegisterId");
+        cashRegisterMapper.updateEntityFromDto(cashRegisterDTO, cashRegister);
 
         return repository.save(cashRegister);
     }

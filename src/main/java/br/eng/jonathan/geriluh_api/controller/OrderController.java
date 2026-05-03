@@ -7,6 +7,8 @@ import br.eng.jonathan.geriluh_api.exception_handler.exceptions.NotFoundExceptio
 import br.eng.jonathan.geriluh_api.service.OrderService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,18 +19,16 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/v1/orders", produces = "application/json")
+@RequiredArgsConstructor
 public class OrderController implements OrderControllerOpenApi {
 
-    @Autowired
-    private OrderService service;
-
-    @Autowired
-    private OrderDTOAssembler assembler;
+    private final OrderService service;
+    private final OrderDTOAssembler assembler;
 
     @GetMapping
     public ResponseEntity<Page<EntityModel<OrderDTO>>> list(Pageable pageable) {
         var orders = service.listAllOrders(pageable)
-                .map(order -> assembler.mapToEntityModelDTO(order));
+                .map(assembler::toModel);
 
         return ResponseEntity.ok(orders);
     }

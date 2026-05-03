@@ -8,6 +8,7 @@ import br.eng.jonathan.geriluh_api.model.Payment;
 import br.eng.jonathan.geriluh_api.service.PaymentService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,24 +19,22 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/v1/payments", produces = "application/json")
+@RequiredArgsConstructor
 public class PaymentController implements PaymentControllerOpenApi {
 
-    @Autowired
-    private PaymentService service;
-
-    @Autowired
-    private PaymentDTOAssembler assembler;
+    private final PaymentService service;
+    private final PaymentDTOAssembler assembler;
 
     @GetMapping
     public ResponseEntity<Page<EntityModel<PaymentDTO>>> list(Pageable pageable) {
         var payments = service.listAllPayments(pageable)
-                .map(payment -> assembler.mapToEntityModelDTO(payment));
+                .map(assembler::toModel);
 
         return ResponseEntity.ok(payments);
     }
 
     @GetMapping("/{paymentId}")
-    public ResponseEntity<EntityModel<PaymentDTO>> getPaymentById(Long paymentId) {
+    public ResponseEntity<EntityModel<PaymentDTO>> getPaymentById(@PathVariable Long paymentId) {
 
         var payment = service.findPaymentById(paymentId);
 
@@ -44,7 +43,7 @@ public class PaymentController implements PaymentControllerOpenApi {
     }
 
     @PostMapping
-    public ResponseEntity<EntityModel<PaymentDTO>> createNewPayment(PaymentDTO paymentDTO, HttpServletResponse response) {
+    public ResponseEntity<EntityModel<PaymentDTO>> createNewPayment(@Valid @RequestBody PaymentDTO paymentDTO, HttpServletResponse response) {
         var payment = service.createPayment(assembler.mapToEntity(paymentDTO));
 
         return new ResponseEntity<EntityModel<PaymentDTO>>(assembler.toModel(payment), HttpStatus.CREATED);

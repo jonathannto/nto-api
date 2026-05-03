@@ -1,5 +1,6 @@
 package br.eng.jonathan.geriluh_api.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,18 +16,16 @@ import br.eng.jonathan.geriluh_api.service.PaymentTypeService;
 
 @RestController
 @RequestMapping(value = "/v1/payment-types", produces = "application/json")
+@RequiredArgsConstructor
 public class PaymentTypeController implements PaymentTypeControllerOpenApi {
 
-    @Autowired
-    private PaymentTypeService service;
-
-    @Autowired
-    private PaymentTypeDTOAssembler assembler;
+    private final PaymentTypeService service;
+    private final PaymentTypeDTOAssembler assembler;
 
     @GetMapping
     public ResponseEntity<Page<EntityModel<PaymentTypeDTO>>> listPaymentType(Pageable pageable) {
         var paymentTypes = service.listAllPaymentType(pageable)
-                .map( paymentType -> assembler.mapToEntityModelDTO(paymentType));
+                .map( assembler::toModel);
         return ResponseEntity.ok(paymentTypes);
     }
 

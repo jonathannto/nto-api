@@ -1,9 +1,12 @@
 package br.eng.jonathan.geriluh_api.service;
 
 import br.eng.jonathan.geriluh_api.dto.OrderDTO;
+import br.eng.jonathan.geriluh_api.dto.mapper.OrderMapper;
 import br.eng.jonathan.geriluh_api.exception_handler.exceptions.NotFoundException;
 import br.eng.jonathan.geriluh_api.model.Order;
 import br.eng.jonathan.geriluh_api.repository.OrderRepository;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -13,15 +16,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
     private static final String ORDER_SEARCH_ERROR = "ORDER.SEARCH_ERROR";
 
-    @Autowired
-    private MessageSource messageSource;
-
-    @Autowired
-    private OrderRepository repository;
+    private final OrderMapper orderMapper;
+    private final MessageSource messageSource;
+    private final OrderRepository repository;
 
     public Page<Order> listAllOrders(Pageable pagination) {
         return repository.findAll(pagination);
@@ -36,11 +38,9 @@ public class OrderService {
     }
 
     public Order updateOrder(Long orderId, OrderDTO orderDTO) {
-        Order order = repository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException(getErrorMessage()));
+        Order order = findOrderById(orderId);
 
-        BeanUtils.copyProperties(orderDTO, order, "orderId", "cashRegisterId", "userId");
-
+        orderMapper.updateEntityFromDto(orderDTO, order);
         return repository.save(order);
     }
 

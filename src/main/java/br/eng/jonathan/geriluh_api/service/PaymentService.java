@@ -1,9 +1,11 @@
 package br.eng.jonathan.geriluh_api.service;
 
 import br.eng.jonathan.geriluh_api.dto.PaymentDTO;
+import br.eng.jonathan.geriluh_api.dto.mapper.PaymentMapper;
 import br.eng.jonathan.geriluh_api.exception_handler.exceptions.NotFoundException;
 import br.eng.jonathan.geriluh_api.model.Payment;
 import br.eng.jonathan.geriluh_api.repository.PaymentRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -13,15 +15,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
 
     private static final String PAYMENT_FIND_PAYMENT_ERRO = "PAYMENT.SEARCH_ERROR";
 
-    @Autowired
-    private MessageSource messageSource;
-
-    @Autowired
-    private PaymentRepository repository;
+    private final PaymentMapper paymentMapper;
+    private final MessageSource messageSource;
+    private final PaymentRepository repository;
 
     public Page<Payment> listAllPayments(Pageable pagination) {
         return repository.findAll(pagination);
@@ -36,9 +37,9 @@ public class PaymentService {
     }
 
     public Payment updatePayment(Long paymentId, PaymentDTO paymentDTO) {
-        Payment existingPayment = repository.findById(paymentId).orElseThrow(() -> new NotFoundException(getMessageErro()));
+        Payment existingPayment = findPaymentById(paymentId);
 
-        BeanUtils.copyProperties(paymentDTO, existingPayment, "paymentId");
+        paymentMapper.updateEntityFromDto(paymentDTO, existingPayment);
         return repository.save(existingPayment);
     }
 
