@@ -38,19 +38,19 @@ public class OrderController implements OrderControllerOpenApi {
         var order = service.findOrderById(orderId);
 
         return ResponseEntity.ok()
-                .body(assembler.mapToEntityModelDTO(order));
+                .body(assembler.toModel(order));
     }
 
     @PostMapping
     public ResponseEntity<EntityModel<OrderDTO>> createNewOrder(@Valid @RequestBody OrderDTO orderDTO, HttpServletResponse response) throws NotFoundException {
         var order = service.createOrder(assembler.mapToEntity(orderDTO));
 
-        return new ResponseEntity<>(assembler.mapToEntityModelDTO(order), HttpStatus.CREATED);
+        return new ResponseEntity<>(assembler.toModel(order), HttpStatus.CREATED);
     }
 
     @PutMapping("/{orderId}")
     public ResponseEntity<EntityModel<OrderDTO>> updateOrder(@PathVariable Long orderId, @Valid @RequestBody OrderDTO orderDTO) {
-        return ResponseEntity.ok(assembler.mapToEntityModelDTO(
+        return ResponseEntity.ok(assembler.toModel(
                 service.updateOrder(orderId, orderDTO)));
     }
 

@@ -8,13 +8,12 @@ import org.mapstruct.*;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {
 
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "securityAnswer", ignore = true)
     UserDTO toDTO(User user);
 
     User toEntity(UserDTO userDTO);
 
-    /**
-     * O @MappingTarget instrui o MapStruct a atualizar a entidade existente.
-     */
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateEntityFromDto(UserDTO dto, @MappingTarget User entity);

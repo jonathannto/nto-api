@@ -2,78 +2,42 @@ package br.eng.jonathan.geriluh_api.dto.assembler;
 
 import br.eng.jonathan.geriluh_api.controller.OrderController;
 import br.eng.jonathan.geriluh_api.dto.OrderDTO;
+import br.eng.jonathan.geriluh_api.dto.mapper.OrderMapper;
 import br.eng.jonathan.geriluh_api.model.Order;
-
-import br.eng.jonathan.geriluh_api.exception_handler.exceptions.NotFoundException;
 import br.eng.jonathan.geriluh_api.service.OrderService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.stereotype.Service;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-@Service
-public class OrderDTOAssembler {
+@Component
+@RequiredArgsConstructor
+public class OrderDTOAssembler implements RepresentationModelAssembler<Order, EntityModel<OrderDTO>> {
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final OrderMapper orderMapper;
+    private final OrderService orderService;
 
-    @Autowired
-    private OrderService orderService;
-
-    public OrderDTO mapToDTO(Order order) {
-        return modelMapper.map(order, OrderDTO.class);
-    }
-
-    public Order mapToEntity(OrderDTO orderDTO) throws NotFoundException {
-        Order order = modelMapper.map(orderDTO, Order.class);
-
-        if (orderDTO.getOrderId() != null) {
-            Order previousOrder = orderService.findOrderById(orderDTO.getOrderId());
-            order.setOrderId(previousOrder.getOrderId());
-            order.setStatus(orderDTO.getStatus() != null ? orderDTO.getStatus() : previousOrder.getStatus());
-            order.setCreationDate(orderDTO.getCreationDate() != null ? orderDTO.getCreationDate() : previousOrder.getCreationDate());
-            order.setEndDate(orderDTO.getEndDate() != null ? orderDTO.getEndDate() : previousOrder.getEndDate());
-            order.setTotalPrice(orderDTO.getTotalPrice() != null ? orderDTO.getTotalPrice() : previousOrder.getTotalPrice());
-            order.setPaymentStatus(orderDTO.getPaymentStatus() != null ? orderDTO.getPaymentStatus() : previousOrder.getPaymentStatus());
-            order.setNotes(orderDTO.getNotes() != null ? orderDTO.getNotes() : previousOrder.getNotes());
-            order.setTableNumber(orderDTO.getTableNumber() != null ? orderDTO.getTableNumber() : previousOrder.getTableNumber());
-            order.setCashRegisterId(previousOrder.getCashRegisterId());
-            order.setUserId(previousOrder.getUserId());
+    public Order mapToEntity(OrderDTO orderDTO) {
+        if (orderDTO.getOrderId() == null) {
+            return orderMapper.toEntity(orderDTO);
         }
-        return order;
+        Order existingOrder = orderService.findOrderById(orderDTO.getOrderId());
+        orderMapper.updateEntityFromDto(orderDTO, existingOrder);
+        return existingOrder;
     }
 
-    /**
-     * Uses {@link ModelMapper} to convert an entity into a DTO
-     * while also transforming the class into an {@link EntityModel} and adding links for HATEOAS
-     * @param order {@link br.eng.jonathan.geriluh_api.model.Order}
-     * @return {@link EntityModel} <{@link br.eng.jonathan.geriluh_api.dto.OrderDTO}>
-     */
-    public EntityModel<OrderDTO> mapToEntityModelDTO(Order order) {
-        return EntityModel.of(mapToDTO(order),
-                linkTo(methodOn(OrderController.class)
-                        .getOrderById(order.getOrderId()))
-                        .withSelfRel()
-                        .withType("GET"),
-                linkTo(methodOn(OrderController.class)
-                        .list(null))
-                        .withRel("list")
-                        .withType("GET"),
-                linkTo(methodOn(OrderController.class)
-                        .createNewOrder(null, null))
-                        .withRel("create")
-                        .withType("POST"),
-                linkTo(methodOn(OrderController.class)
-                        .updateOrder(order.getOrderId(), null))
-                        .withRel("update")
-                        .withType("PUT"),
-                linkTo(methodOn(OrderController.class)
-                        .deleteOrder(order.getOrderId()))
-                        .withRel("delete")
-                        .withType("DELETE")
+    @Override
+    public EntityModel<OrderDTO> toModel(Order order) {
+        OrderDTO dto = orderMapper.toDTO(order);
+        return EntityModel.of(dto,
+                linkTo(methodOn(OrderController.class).getOrderById(order.getOrderId())).withSelfRel().withType("GET"),
+                linkTo(methodOn(OrderController.class).list(null)).withRel("list").withType("GET"),
+                linkTo(methodOn(OrderController.class).createNewOrder(null, null)).withRel("create").withType("POST"),
+                linkTo(methodOn(OrderController.class).updateOrder(order.getOrderId(), null)).withRel("update").withType("PUT"),
+                linkTo(methodOn(OrderController.class).deleteOrder(order.getOrderId())).withRel("delete").withType("DELETE")
         );
     }
 }

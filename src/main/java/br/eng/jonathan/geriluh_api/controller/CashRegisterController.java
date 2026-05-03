@@ -39,19 +39,19 @@ public class CashRegisterController implements CashRegisterControllerOpenApi {
         var cashRegister = service.findCashRegisterById(cashRegisterId);
 
         return ResponseEntity.ok()
-                .body(assembler.mapToEntityModelDTO(cashRegister));
+                .body(assembler.toModel(cashRegister));
     }
 
     @PostMapping
     public ResponseEntity<EntityModel<CashRegisterDTO>> createNewCashRegister(@Valid @RequestBody CashRegisterDTO cashRegisterDTO, HttpServletResponse response) throws NotFoundException {
         var cashRegister = service.createCashRegister(assembler.mapToEntity(cashRegisterDTO));
 
-        return new ResponseEntity<EntityModel<CashRegisterDTO>>(assembler.mapToEntityModelDTO(cashRegister), HttpStatus.CREATED);
+        return new ResponseEntity<EntityModel<CashRegisterDTO>>(assembler.toModel(cashRegister), HttpStatus.CREATED);
     }
 
     @PutMapping("/{idCashRegister}")
     public ResponseEntity<EntityModel<CashRegisterDTO>> updateCashRegister(@PathVariable Long idCashRegister, @Valid @RequestBody CashRegisterDTO cashRegisterDTO) {
-        return ResponseEntity.ok(assembler.mapToEntityModelDTO(
+        return ResponseEntity.ok(assembler.toModel(
                 service.updateCashRegister(idCashRegister, cashRegisterDTO)));
     }
 

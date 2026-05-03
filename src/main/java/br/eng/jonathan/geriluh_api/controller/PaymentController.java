@@ -40,19 +40,19 @@ public class PaymentController implements PaymentControllerOpenApi {
         var payment = service.findPaymentById(paymentId);
 
         return ResponseEntity.ok()
-                .body(assembler.mapToEntityModelDTO(payment));
+                .body(assembler.toModel(payment));
     }
 
     @PostMapping
     public ResponseEntity<EntityModel<PaymentDTO>> createNewPayment(PaymentDTO paymentDTO, HttpServletResponse response) {
         var payment = service.createPayment(assembler.mapToEntity(paymentDTO));
 
-        return new ResponseEntity<EntityModel<PaymentDTO>>(assembler.mapToEntityModelDTO(payment), HttpStatus.CREATED);
+        return new ResponseEntity<EntityModel<PaymentDTO>>(assembler.toModel(payment), HttpStatus.CREATED);
     }
 
     @PutMapping("/{paymentId}")
     public ResponseEntity<EntityModel<PaymentDTO>> updatePayment(@PathVariable Long paymentId, @Valid @RequestBody PaymentDTO paymentDTO) {
-        return ResponseEntity.ok(assembler.mapToEntityModelDTO(
+        return ResponseEntity.ok(assembler.toModel(
                 service.updatePayment(paymentId, paymentDTO)));
     }
 

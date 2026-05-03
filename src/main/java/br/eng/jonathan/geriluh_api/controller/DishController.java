@@ -42,19 +42,19 @@ public class DishController implements DishControllerOpenApi {
         var dish = service.findDishById(dishId);
 
         return ResponseEntity.ok()
-                .body(assembler.mapToEntityModelDTO(dish));
+                .body(assembler.toModel(dish));
     }
 
     @PostMapping
     public ResponseEntity<EntityModel<DishDTO>> createNewDish(@Valid @RequestBody DishDTO dishDTO, HttpServletResponse response) {
         var dish = service.createDish(assembler.mapToEntity(dishDTO));
 
-        return new ResponseEntity<>(assembler.mapToEntityModelDTO(dish), HttpStatus.CREATED);
+        return new ResponseEntity<>(assembler.toModel(dish), HttpStatus.CREATED);
     }
 
     @PutMapping("/{dishId}")
     public ResponseEntity<EntityModel<DishDTO>> updateDish(@PathVariable Long dishId, @Valid @RequestBody DishDTO dishDTO) {
-        return ResponseEntity.ok(assembler.mapToEntityModelDTO(
+        return ResponseEntity.ok(assembler.toModel(
                 service.updateDish(dishId, dishDTO)));
     }
 

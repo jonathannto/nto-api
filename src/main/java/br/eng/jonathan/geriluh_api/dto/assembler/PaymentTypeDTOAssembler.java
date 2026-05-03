@@ -1,75 +1,43 @@
 package br.eng.jonathan.geriluh_api.dto.assembler;
-import br.eng.jonathan.geriluh_api.controller.CashRegisterController;
+
+import br.eng.jonathan.geriluh_api.controller.PaymentTypeController; // Ajustado para o controller correto
 import br.eng.jonathan.geriluh_api.dto.PaymentTypeDTO;
+import br.eng.jonathan.geriluh_api.dto.mapper.PaymentTypeMapper;
 import br.eng.jonathan.geriluh_api.model.PaymentType;
 import br.eng.jonathan.geriluh_api.service.PaymentTypeService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.stereotype.Service;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-@Service
-public class PaymentTypeDTOAssembler {
+@Component
+@RequiredArgsConstructor
+public class PaymentTypeDTOAssembler implements RepresentationModelAssembler<PaymentType, EntityModel<PaymentTypeDTO>> {
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
-    private PaymentTypeService service;
-
-    public PaymentTypeDTO mapToDTO(PaymentType paymentType) {
-        return modelMapper.map(paymentType, PaymentTypeDTO.class);
-    }
+    private final PaymentTypeMapper paymentTypeMapper;
+    private final PaymentTypeService paymentTypeService;
 
     public PaymentType mapToEntity(PaymentTypeDTO paymentTypeDTO) {
-
-        PaymentType paymentType = modelMapper.map(paymentTypeDTO, PaymentType.class);
-
-        if(paymentTypeDTO.getPaymentTypeId() != null) {
-            PaymentType previousPaymentType = service.findPaymentTypeById(paymentTypeDTO.getPaymentTypeId());
-            paymentType.setPaymentTypeId(previousPaymentType.getPaymentTypeId());
-            paymentType.setName(paymentTypeDTO.getName() != null ? paymentTypeDTO.getName() : previousPaymentType.getName());
-            paymentType.setDescription(paymentTypeDTO.getDescription() != null ? paymentTypeDTO.getDescription() : previousPaymentType.getDescription());
+        if (paymentTypeDTO.getPaymentTypeId() == null) {
+            return paymentTypeMapper.toEntity(paymentTypeDTO);
         }
-
-        return paymentType;
+        PaymentType existing = paymentTypeService.findPaymentTypeById(paymentTypeDTO.getPaymentTypeId());
+        paymentTypeMapper.updateEntityFromDto(paymentTypeDTO, existing);
+        return existing;
     }
 
-    /**
-     * Uses {@link ModelMapper} to convert an entity into a DTO
-     * while also transforming the class into an {@link EntityModel} and adding links for HATEOAS
-     * @author Jonathan
-     * @since 1.0
-     * @serialData 2025-01-13
-     * @param paymentType {@link br.eng.jonathan.geriluh_api.model.PaymentType}
-     * @return {@link EntityModel} <{@link br.eng.jonathan.geriluh_api.dto.PaymentTypeDTO}>
-     */
-    public EntityModel<PaymentTypeDTO> mapToEntityModelDTO(PaymentType paymentType) {
-        return EntityModel.of(mapToDTO(paymentType),
-                linkTo(methodOn(CashRegisterController.class)
-                        .getCashRegisterById(paymentType.getPaymentTypeId()))
-                        .withSelfRel()
-                        .withType("GET"),
-                linkTo(methodOn(CashRegisterController.class)
-                        .list(null))
-                        .withRel("list")
-                        .withType("GET"),
-                linkTo(methodOn(CashRegisterController.class)
-                        .createNewCashRegister(null, null))
-                        .withRel("create")
-                        .withType("POST"),
-                linkTo(methodOn(CashRegisterController.class)
-                        .updateCashRegister(paymentType.getPaymentTypeId(), null))
-                        .withRel("update")
-                        .withType("PUT"),
-                linkTo(methodOn(CashRegisterController.class)
-                        .deleteCashRegister(paymentType.getPaymentTypeId()))
-                        .withRel("delete")
-                        .withType("DELETE")
+    @Override
+    public EntityModel<PaymentTypeDTO> toModel(PaymentType pt) {
+        PaymentTypeDTO dto = paymentTypeMapper.toDTO(pt);
+        return EntityModel.of(dto,
+                linkTo(methodOn(PaymentTypeController.class).getPaymentTypeById(pt.getPaymentTypeId())).withSelfRel().withType("GET"),
+                linkTo(methodOn(PaymentTypeController.class).list(null)).withRel("list").withType("GET"),
+                linkTo(methodOn(PaymentTypeController.class).createNewPaymentType(null, null)).withRel("create").withType("POST"),
+                linkTo(methodOn(PaymentTypeController.class).updatePaymentType(pt.getPaymentTypeId(), null)).withRel("update").withType("PUT"),
+                linkTo(methodOn(PaymentTypeController.class).deletePaymentType(pt.getPaymentTypeId())).withRel("delete").withType("DELETE")
         );
     }
-
 }

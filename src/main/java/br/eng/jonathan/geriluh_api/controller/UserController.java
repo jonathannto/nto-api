@@ -7,6 +7,7 @@ import br.eng.jonathan.geriluh_api.exception_handler.exceptions.NotFoundExceptio
 import br.eng.jonathan.geriluh_api.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,41 +18,39 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/v1/users", produces = "application/json")
+@RequiredArgsConstructor
 public class UserController implements UserControllerOpenApi {
 
-    @Autowired
-    private UserService service;
-
-    @Autowired
-    private UserDTOAssembler assembler;
+    private final UserService service;
+    private final UserDTOAssembler assembler;
 
     @GetMapping
     public ResponseEntity<Page<EntityModel<UserDTO>>> list(Pageable pageable) {
         var users = service.listAllUsers(pageable)
-                .map(user -> assembler.mapToEntityModelDTO(user));
+                .map(assembler::toModel);
 
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<EntityModel<UserDTO>> getUserById(Long userId) {
+    public ResponseEntity<EntityModel<UserDTO>> getUserById(@PathVariable Long userId) {
 
         var user = service.findUserById(userId);
 
         return ResponseEntity.ok()
-                .body(assembler.mapToEntityModelDTO(user));
+                .body(assembler.toModel(user));
     }
 
     @PostMapping
     public ResponseEntity<EntityModel<UserDTO>> createNewUser(@Valid @RequestBody UserDTO userDTO, HttpServletResponse response) throws NotFoundException {
         var user = service.createUser(assembler.mapToEntity(userDTO));
 
-        return new ResponseEntity<EntityModel<UserDTO>>(assembler.mapToEntityModelDTO(user), HttpStatus.CREATED);
+        return new ResponseEntity<EntityModel<UserDTO>>(assembler.toModel(user), HttpStatus.CREATED);
     }
 
     @PutMapping("/{userId}")
     public ResponseEntity<EntityModel<UserDTO>> updateUser(@PathVariable Long userId, @Valid @RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(assembler.mapToEntityModelDTO(
+        return ResponseEntity.ok(assembler.toModel(
                 service.updateUser(userId, userDTO)));
     }
 

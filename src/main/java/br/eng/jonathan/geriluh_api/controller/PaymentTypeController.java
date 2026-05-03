@@ -33,19 +33,19 @@ public class PaymentTypeController implements PaymentTypeControllerOpenApi {
     @GetMapping("/{paymentTypeId}")
     public ResponseEntity<EntityModel<PaymentTypeDTO>> getPaymentTypeById(@PathVariable Long paymentTypeId) {
         var paymentType = service.findPaymentTypeById(paymentTypeId);
-        return ResponseEntity.ok(assembler.mapToEntityModelDTO(paymentType));
+        return ResponseEntity.ok(assembler.toModel(paymentType));
     }
 
     @PostMapping
     public ResponseEntity<EntityModel<PaymentTypeDTO>> createPaymentType(@RequestBody PaymentTypeDTO paymentTypeDTO) {
         var createdPaymentType = service.createPaymentType(assembler.mapToEntity(paymentTypeDTO));
-        return ResponseEntity.status(HttpStatus.CREATED).body(assembler.mapToEntityModelDTO(createdPaymentType));
+        return ResponseEntity.status(HttpStatus.CREATED).body(assembler.toModel(createdPaymentType));
     }
 
     @PutMapping("/{paymentTypeId}")
     public ResponseEntity<EntityModel<PaymentTypeDTO>> updatePaymentType(@PathVariable Long paymentTypeId, @RequestBody PaymentTypeDTO paymentTypeDTO) {
         var updatedPaymentType = service.updatePaymentType(paymentTypeId, paymentTypeDTO);
-        return ResponseEntity.ok(assembler.mapToEntityModelDTO(updatedPaymentType));
+        return ResponseEntity.ok(assembler.toModel(updatedPaymentType));
     }
 
     @DeleteMapping("/{paymentTypeId}")

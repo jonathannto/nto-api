@@ -2,23 +2,23 @@ package br.eng.jonathan.geriluh_api.dto.assembler;
 
 import br.eng.jonathan.geriluh_api.controller.CashRegisterController;
 import br.eng.jonathan.geriluh_api.dto.CashRegisterDTO;
-import br.eng.jonathan.geriluh_api.dto.UserDTO;
 import br.eng.jonathan.geriluh_api.dto.mapper.CashRegisterMapper;
-import br.eng.jonathan.geriluh_api.exception_handler.exceptions.NotFoundException;
 import br.eng.jonathan.geriluh_api.model.CashRegister;
-import br.eng.jonathan.geriluh_api.model.User;
 import br.eng.jonathan.geriluh_api.service.CashRegisterService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * Assembler responsável por converter a entidade CashRegister em recursos DTO com links HATEOAS.
+ *
+ * @author Jonathan Nascimento
+ * @since 1.0
+ */
 @Component
 @RequiredArgsConstructor
 public class CashRegisterDTOAssembler implements RepresentationModelAssembler<CashRegister, EntityModel<CashRegisterDTO>> {
@@ -26,21 +26,21 @@ public class CashRegisterDTOAssembler implements RepresentationModelAssembler<Ca
     private final CashRegisterMapper cashRegisterMapper;
     private final CashRegisterService cashRegisterService;
 
-    public CashRegister mapToEntity(CashRegisterDTO cashRegisterDTO) throws NotFoundException {
-        //Refatorando...
+    public CashRegister mapToEntity(CashRegisterDTO cashRegisterDTO) {
+        if (cashRegisterDTO.getCashRegisterId() == null) {
+            return cashRegisterMapper.toEntity(cashRegisterDTO);
+        }
+
+        CashRegister existingRegister = cashRegisterService.findCashRegisterById(cashRegisterDTO.getCashRegisterId());
+        cashRegisterMapper.updateEntityFromDto(cashRegisterDTO, existingRegister);
+        return existingRegister;
     }
 
-    /**
-     * Uses {@link ModelMapper} to convert an entity into a DTO
-     * while also transforming the class into an {@link EntityModel} and adding links for HATEOAS
-     * @author Jonathan
-     * @since 1.0
-     * @serialData 2024-12-03
-     * @param cashRegister {@link br.eng.jonathan.geriluh_api.model.CashRegister}
-     * @return {@link EntityModel} <{@link br.eng.jonathan.geriluh_api.dto.CashRegisterDTO}>
-     */
-    public EntityModel<CashRegisterDTO> mapToEntityModelDTO(CashRegister cashRegister) {
-        return EntityModel.of(mapToDTO(cashRegister),
+    @Override
+    public EntityModel<CashRegisterDTO> toModel(CashRegister cashRegister) {
+        CashRegisterDTO dto = cashRegisterMapper.toDTO(cashRegister);
+
+        return EntityModel.of(dto,
                 linkTo(methodOn(CashRegisterController.class)
                         .getCashRegisterById(cashRegister.getCashRegisterId()))
                         .withSelfRel()
@@ -63,6 +63,4 @@ public class CashRegisterDTOAssembler implements RepresentationModelAssembler<Ca
                         .withType("DELETE")
         );
     }
-
-
 }

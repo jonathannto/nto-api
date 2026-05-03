@@ -8,12 +8,13 @@ import org.mapstruct.*;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CashRegisterMapper {
 
-    CashRegisterDTO toDTO(CashRegister cashRegister);
-
+    @Mapping(target = "user", ignore = true)
     CashRegister toEntity(CashRegisterDTO cashRegisterDTO);
 
-    @Mapping(target = "cashRegisterId", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    void updateEntityFromDto(CashRegisterDTO dto, @MappingTarget CashRegister cashRegister);
+    @Mapping(target = "userId", source = "user.userId")
+    CashRegisterDTO toDTO(CashRegister cashRegister);
 
+    @Mapping(target = "cashRegisterId", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    void updateEntityFromDto(CashRegisterDTO dto, @MappingTarget CashRegister entity);
 }
