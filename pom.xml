@@ -11,10 +11,10 @@
     </parent>
 
     <groupId>br.eng.jonathan</groupId>
-    <artifactId>geriluh-api</artifactId>
+    <artifactId>nto-erp-api</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>geriluh-api</name>
-    <description>Enterprise Architecture Showcase - Java 25 and Spring Boot 4</description>
+    <name>nto-erp-api</name>
+    <description>NTO ERP System</description>
 
     <properties>
         <java.version>25</java.version>
