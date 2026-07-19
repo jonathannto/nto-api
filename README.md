@@ -5,7 +5,7 @@
 ![Postgres](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=for-the-badge)
 
-This GitHub repository contains the source code for NTO-ERP's API, a comprehensive and customizable business management system designed specifically for the unique operational needs of **Cafeterias and Bistros**.
+This GitHub repository contains the source code for NTO-ERP's API, a comprehensive and customizable business management system designed specifically for the unique operational needs of **Cafés and Bistros**.
 
 ## 📋 What is NTO-ERP?
 
@@ -26,15 +26,15 @@ NTO-ERP offers a powerful suite of features to manage various aspects of your bu
 
 ## 🛠️ Technology Stack
 
-| Layer | Technology                                    |
-| :--- |:----------------------------------------------|
-| **Language** | Java 25                                       |
+| Layer | Technology |
+| :--- | :--- |
+| **Language** | Java 25 |
 | **Framework** | Spring Ecosystem (Boot 4, Data JPA, Security) |
-| **Database** | PostgreSQL                                    |
-| **Migrations** | Flyway                                        |
-| **API Docs** | springdoc / OpenAPI                           |
-| **Observability** | Micrometer Tracing                            |
-| **Deployment** | VPS using Docker (Containers)                            |
+| **Database** | PostgreSQL |
+| **Migrations** | Flyway |
+| **API Docs** | springdoc / OpenAPI |
+| **Observability** | Micrometer Tracing |
+| **Deployment** | VPS using Docker (Containers) |
 
 ---
 
@@ -42,14 +42,12 @@ NTO-ERP offers a powerful suite of features to manage various aspects of your bu
 
 To install and run NTO-ERP on your local environment, follow the step-by-step instructions in the [INSTALL.md](INSTALL.md) file.
 
-## 🤝 Contributing
-
-The community is welcome to contribute to the development of NTO-ERP. To learn how to contribute, please read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
-
 ## 📄 Documentation & Support
 
-*   **Full Documentation:** Comprehensive documentation for NTO-ERP is available at [jonathan.eng.br](https://jonathan.eng.br)
-*   **Community Forum:** For support and discussions, join us at [jonathan.eng.br Forum](https://jonathan.eng.br)
+*   **Full Documentation:** Comprehensive documentation for NTO-ERP is available at [jonathan.eng.br](https://jonathan.eng.br) - *Under Construction*
+*   **Community Forum:** For support and discussions, join us at [jonathan.eng.br Forum](https://jonathan.eng.br) - *Under Construction*
+*   **Swagger Documentation:**
+    ![Swagger Preview](swagger.png)
 
 ---
 
